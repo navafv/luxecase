@@ -14,6 +14,7 @@ import WishlistPage from "./pages/WishlistPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";
 import ProductForm from "./pages/admin/ProductForm";
@@ -120,6 +121,7 @@ function App() {
             {/* Admin Routes (Protected) */}
             <Route path="/admin" element={<AdminRoute />}>
               <Route element={<AdminLayout />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminOrders />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products/add" element={<ProductForm />} />

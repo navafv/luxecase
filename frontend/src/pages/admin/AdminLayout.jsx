@@ -17,7 +17,13 @@ const AdminLayout = () => {
             to="/admin/dashboard"
             className="flex items-center p-3 hover:bg-gray-800 rounded transition"
           >
-            <FaClipboardList className="mr-3" /> Orders
+            <FaClipboardList className="mr-3" /> Dashboard
+          </Link>
+          <Link
+            to="/admin/orders"
+            className="flex items-center p-3 hover:bg-gray-800 rounded transition"
+          >
+            <FaBoxOpen className="mr-3" /> All Orders
           </Link>
           <Link
             to="/admin/products"
