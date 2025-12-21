@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  /* Define custom colors here */
+  --color-primary: #D4AF37; /* Luxe Gold */
+  --color-dark: #1a1a1a;    /* Luxe Dark */
+}
+
+/* Global Styles */
+body {
+  background-color: #f9fafb;
+  color: #1a1a1a;
+}
