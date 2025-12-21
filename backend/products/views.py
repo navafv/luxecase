@@ -4,27 +4,19 @@ from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
 
 class IsAdminOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission:
-    - Readers (GET) can be anyone.
-    - Writers (POST, PUT, DELETE) must be Admins.
-    """
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user and request.user.is_staff
+        return bool(request.user and request.user.is_staff)
 
 class ProductViewSet(viewsets.ModelViewSet):
-    """
-    Handles Listing, Creating, Updating, and Deleting Products.
-    """
     queryset = Product.objects.all().order_by('-created_at')
     serializer_class = ProductSerializer
-    permission_classes = [IsAdminOrReadOnly] # <--- Secure it!
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category__slug']
     search_fields = ['name', 'description']
-    lookup_field = 'slug' # We use slug for URLs
+    lookup_field = 'slug'
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
