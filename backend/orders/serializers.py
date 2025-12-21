@@ -17,23 +17,27 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'full_name', 'address', 'city', 'phone', 
             'total_amount', 'status', 'is_paid', 'created_at', 'items'
         ]
-        # Make total_amount read-only so the frontend can't dictate the price
         read_only_fields = ['total_amount', 'user', 'status', 'is_paid']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
         user = self.context['request'].user
         
-        # 1. Calculate total price securely on the backend
         calculated_total = 0
+        
+        # 1. Validation Phase (Check Stock & Price)
         for item in items_data:
             try:
                 product = Product.objects.get(id=item['product_id'])
+                if product.stock < item['quantity']:
+                    raise serializers.ValidationError(
+                        f"Insufficient stock for {product.name}. Only {product.stock} left."
+                    )
                 calculated_total += product.price * item['quantity']
             except Product.DoesNotExist:
                 raise serializers.ValidationError(f"Product {item['product_id']} does not exist")
 
-        # 2. Create Order Atomically (All or Nothing)
+        # 2. Creation Phase (Atomic Transaction)
         with transaction.atomic():
             order = Order.objects.create(
                 user=user, 
@@ -42,7 +46,16 @@ class OrderSerializer(serializers.ModelSerializer):
             )
 
             for item in items_data:
-                product = Product.objects.get(id=item['product_id'])
+                product = Product.objects.select_for_update().get(id=item['product_id'])
+                
+                # Double check stock inside transaction to prevent race conditions
+                if product.stock < item['quantity']:
+                    raise serializers.ValidationError(f"Stock changed! {product.name} is out of stock.")
+
+                # Deduct Stock
+                product.stock -= item['quantity']
+                product.save()
+
                 OrderItem.objects.create(
                     order=order,
                     product=product,
