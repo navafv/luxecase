@@ -19,3 +19,11 @@ class MyOrderListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
+    
+class AdminOrderListView(generics.ListAPIView):
+    """
+    Returns ALL orders (for Admins only).
+    """
+    queryset = Order.objects.all().order_by('-created_at')
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAdminUser] # Strict Admin check

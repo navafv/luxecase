@@ -1,24 +1,32 @@
-from rest_framework import generics, filters
+from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
 
-class ProductListView(generics.ListAPIView):
+class IsAdminOrReadOnly(permissions.BasePermission):
     """
-    Returns a list of products.
-    Includes Searching and Filtering (by Category).
+    Custom permission:
+    - Readers (GET) can be anyone.
+    - Writers (POST, PUT, DELETE) must be Admins.
     """
-    queryset = Product.objects.filter(is_available=True).order_by('-created_at')
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user and request.user.is_staff
+
+class ProductViewSet(viewsets.ModelViewSet):
+    """
+    Handles Listing, Creating, Updating, and Deleting Products.
+    """
+    queryset = Product.objects.all().order_by('-created_at')
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly] # <--- Secure it!
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category__slug']  # Allow ?category__slug=necklace-box
-    search_fields = ['name', 'description'] # Allow ?search=velvet
+    filterset_fields = ['category__slug']
+    search_fields = ['name', 'description']
+    lookup_field = 'slug' # We use slug for URLs
 
-class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.filter(is_available=True)
-    serializer_class = ProductSerializer
-    lookup_field = 'slug'
-
-class CategoryListView(generics.ListAPIView):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
