@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
+import toast from "react-hot-toast";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -10,6 +11,26 @@ const AdminOrders = () => {
       .then((res) => setOrders(res.data))
       .catch((err) => console.error(err));
   }, []);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await api.patch(`orders/${orderId}/status/`, { status: newStatus });
+      setOrders(
+        orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+      toast.success(`Order #${orderId} marked as ${newStatus}`);
+    } catch {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const statusColors = {
+    Pending: "bg-yellow-100 text-yellow-800",
+    Processing: "bg-blue-100 text-blue-800",
+    Shipped: "bg-purple-100 text-purple-800",
+    Delivered: "bg-green-100 text-green-800",
+    Cancelled: "bg-red-100 text-red-800",
+  };
 
   return (
     <div>
@@ -22,7 +43,7 @@ const AdminOrders = () => {
               <th className="p-4">Customer</th>
               <th className="p-4">Total</th>
               <th className="p-4">Status</th>
-              <th className="p-4">Date</th>
+              <th className="p-4">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -37,16 +58,26 @@ const AdminOrders = () => {
                 <td className="p-4">
                   <span
                     className={`px-2 py-1 rounded text-xs ${
-                      order.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-green-100 text-green-800"
+                      statusColors[order.status] || "bg-gray-100"
                     }`}
                   >
                     {order.status}
                   </span>
                 </td>
-                <td className="p-4 text-gray-500">
-                  {new Date(order.created_at).toLocaleDateString()}
+                <td className="p-4">
+                  <select
+                    className="border rounded p-1 text-sm bg-white"
+                    value={order.status}
+                    onChange={(e) =>
+                      handleStatusChange(order.id, e.target.value)
+                    }
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
                 </td>
               </tr>
             ))}

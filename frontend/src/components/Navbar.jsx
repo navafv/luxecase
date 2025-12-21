@@ -33,7 +33,13 @@ const Navbar = () => {
           </Link>
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm">Hi, {user.name}</span>
+              {/* Make name clickable */}
+              <Link
+                to="/profile"
+                className="text-sm hover:underline font-semibold"
+              >
+                Hi, {user.name}
+              </Link>
               <button onClick={logout} className="text-sm hover:text-red-400">
                 Logout
               </button>

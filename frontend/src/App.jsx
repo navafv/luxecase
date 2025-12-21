@@ -11,6 +11,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import WishlistPage from "./pages/WishlistPage";
+import ProfilePage from "./pages/ProfilePage";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -101,6 +102,16 @@ function App() {
                 <>
                   <Navbar />
                   <WishlistPage />
+                  <Footer />
+                </>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <>
+                  <Navbar />
+                  <ProfilePage />
                   <Footer />
                 </>
               }

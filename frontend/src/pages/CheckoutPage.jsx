@@ -1,20 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
+import toast from "react-hot-toast";
 
 const CheckoutPage = () => {
   const { cartItems, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
 
-  // Form State
   const [formData, setFormData] = useState({
     full_name: "",
     address: "",
     city: "",
     phone: "",
   });
+
+  useEffect(() => {
+    // Fetch saved addresses
+    api
+      .get("users/addresses/")
+      .then((res) => setSavedAddresses(res.data))
+      .catch(() => {});
+  }, []);
+
+  const fillAddress = (addr) => {
+    setFormData({
+      full_name: addr.full_name,
+      address: `${addr.address_line}, ${addr.state}, ${addr.postal_code}`,
+      city: addr.city,
+      phone: addr.phone,
+    });
+    toast.success("Address applied!");
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,37 +43,30 @@ const CheckoutPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    // 1. Prepare Payload for Django API
-    // Match the structure expected by your backend/orders/serializers.py
     const orderPayload = {
       ...formData,
-      total_amount: cartTotal, // In a real app, backend should recalc this!
+      total_amount: 0, // Backend calculates this now
       status: "Pending",
       items: cartItems.map((item) => ({
         product_id: item.id,
         quantity: item.quantity,
-        variations: item.category?.name || "Standard", // Sending category as variation for MVP
+        variations: item.category?.name || "Standard",
       })),
     };
 
     try {
-      // 2. Send to Backend
       await api.post("orders/create/", orderPayload);
-
-      // 3. Success Handling
-      clearCart(); // Empty the cart
-      navigate("/order-success"); // Go to success page
+      clearCart();
+      navigate("/order-success");
     } catch (error) {
-      console.error("Order failed:", error.response?.data || error.message);
-      alert("Something went wrong placing your order. Please try again.");
+      toast.error(error.response?.data?.detail || "Order failed");
     } finally {
       setLoading(false);
     }
   };
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0)
     return <div className="p-10 text-center">Your cart is empty.</div>;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,14 +75,31 @@ const CheckoutPage = () => {
       </h1>
 
       <div className="flex flex-col md:flex-row gap-8 max-w-4xl mx-auto">
-        {/* Shipping Form */}
         <div className="md:w-1/2 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Shipping Details</h2>
+
+          {/* Saved Addresses Buttons */}
+          {savedAddresses.length > 0 && (
+            <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+              {savedAddresses.map((addr) => (
+                <button
+                  key={addr.id}
+                  type="button"
+                  onClick={() => fillAddress(addr)}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300 px-3 py-2 rounded whitespace-nowrap"
+                >
+                  Use: {addr.city}
+                </button>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium">Full Name</label>
               <input
                 name="full_name"
+                value={formData.full_name}
                 required
                 className="w-full p-2 border rounded"
                 onChange={handleChange}
@@ -80,6 +109,7 @@ const CheckoutPage = () => {
               <label className="block text-sm font-medium">Phone Number</label>
               <input
                 name="phone"
+                value={formData.phone}
                 required
                 className="w-full p-2 border rounded"
                 onChange={handleChange}
@@ -89,6 +119,7 @@ const CheckoutPage = () => {
               <label className="block text-sm font-medium">Address</label>
               <textarea
                 name="address"
+                value={formData.address}
                 required
                 className="w-full p-2 border rounded"
                 rows="3"
@@ -99,6 +130,7 @@ const CheckoutPage = () => {
               <label className="block text-sm font-medium">City</label>
               <input
                 name="city"
+                value={formData.city}
                 required
                 className="w-full p-2 border rounded"
                 onChange={handleChange}
@@ -110,12 +142,11 @@ const CheckoutPage = () => {
               disabled={loading}
               className="w-full bg-dark text-white py-3 rounded mt-4 hover:bg-primary transition disabled:bg-gray-400"
             >
-              {loading ? "Processing..." : `Pay ₹${cartTotal.toFixed(2)}`}
+              {loading ? "Processing..." : `Place Order`}
             </button>
           </form>
         </div>
 
-        {/* Mini Order Summary */}
         <div className="md:w-1/2 bg-gray-50 p-6 rounded-lg h-fit">
           <h2 className="text-xl font-semibold mb-4">Your Items</h2>
           <div className="space-y-3 max-h-60 overflow-y-auto mb-4">
@@ -131,7 +162,7 @@ const CheckoutPage = () => {
             ))}
           </div>
           <div className="border-t pt-4 flex justify-between font-bold text-lg">
-            <span>Total</span>
+            <span>Estimated Total</span>
             <span>₹{cartTotal.toFixed(2)}</span>
           </div>
         </div>
