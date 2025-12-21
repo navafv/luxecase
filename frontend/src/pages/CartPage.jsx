@@ -15,9 +15,8 @@ const CartPage = () => {
       navigate("/login");
       return;
     }
-    // Proceed to Checkout Logic (This creates the Order in Django)
-    // We can do this in the next step or here quickly:
-    placeOrder();
+    // Redirect to the new Checkout Page
+    navigate("/checkout");
   };
 
   if (cartItems.length === 0) {

@@ -6,6 +6,8 @@ import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/order-success" element={<OrderSuccessPage />} />
               </Routes>
             </main>
             <footer className="bg-dark text-white text-center p-4 mt-8">
