@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -19,6 +20,7 @@ function App() {
     <Router>
       <AuthProvider>
         <CartProvider>
+          <Toaster position="top-center" />
           <Routes>
             {/* Public Routes */}
             <Route

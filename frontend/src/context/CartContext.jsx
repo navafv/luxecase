@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import toast from 'react-hot-toast';
 
 const CartContext = createContext();
 
@@ -30,7 +31,7 @@ export const CartProvider = ({ children }) => {
         return [...prevItems, { ...product, quantity }];
       }
     });
-    alert(`${product.name} added to cart!`); // Simple feedback for MVP
+    toast.success(`${product.name} added to cart!`);
   };
 
   // Remove Item from Cart

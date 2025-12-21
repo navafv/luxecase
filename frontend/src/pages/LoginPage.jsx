@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -14,7 +15,7 @@ const LoginPage = () => {
       await login(formData.email, formData.password);
       navigate("/"); // Redirect to Home after login
     } catch {
-      setError("Invalid credentials. Please try again.");
+      toast.error("Invalid credentials.");
     }
   };
 
