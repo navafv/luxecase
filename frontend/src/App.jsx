@@ -122,7 +122,7 @@ function App() {
             <Route path="/admin" element={<AdminRoute />}>
               <Route element={<AdminLayout />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="dashboard" element={<AdminOrders />} />
+                <Route path="orders" element={<AdminOrders />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products/add" element={<ProductForm />} />
                 <Route path="products/edit/:slug" element={<ProductForm />} />
