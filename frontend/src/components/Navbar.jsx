@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaShoppingCart, FaUser } from "react-icons/fa";
+import { FaShoppingCart, FaUser, FaHeart } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
@@ -19,6 +19,9 @@ const Navbar = () => {
           className="hidden md:block px-4 py-2 rounded-full text-black focus:outline-none bg-gray-100"
         />
         <div className="flex items-center space-x-6">
+          <Link to="/wishlist" className="hover:text-primary transition">
+            <FaHeart size={20} />
+          </Link>
           <Link to="/cart" className="relative hover:text-primary transition">
             <FaShoppingCart size={20} />
             {/* Dynamic Badge */}

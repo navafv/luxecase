@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import WishlistPage from "./pages/WishlistPage";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -79,6 +81,26 @@ function App() {
                 <>
                   <Navbar />
                   <OrderSuccessPage />
+                  <Footer />
+                </>
+              }
+            />
+            <Route
+              path="/product/:slug"
+              element={
+                <>
+                  <Navbar />
+                  <ProductDetailPage />
+                  <Footer />
+                </>
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <>
+                  <Navbar />
+                  <WishlistPage />
                   <Footer />
                 </>
               }
