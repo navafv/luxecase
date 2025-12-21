@@ -12,6 +12,7 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const [qty, setQty] = useState(1);
 
   // Review Form State
   const [rating, setRating] = useState(5);
@@ -104,16 +105,26 @@ const ProductDetailPage = () => {
             {product.description}
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-end">
+            <div>
+              <label className="block text-sm font-bold mb-1">Quantity</label>
+              <input
+                type="number"
+                min="1"
+                value={qty}
+                onChange={(e) => setQty(parseInt(e.target.value) || 1)}
+                className="w-20 p-3 border rounded-lg text-center"
+              />
+            </div>
             <button
-              onClick={() => addToCart(product)}
-              className="flex-1 bg-dark text-white py-3 rounded-lg hover:bg-primary transition"
+              onClick={() => addToCart(product, qty)}
+              className="flex-1 bg-dark text-white py-3 rounded-lg hover:bg-primary transition h-12"
             >
               Add to Cart
             </button>
             <button
               onClick={handleWishlist}
-              className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-red-500"
+              className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-red-500 h-12 flex items-center justify-center"
             >
               <FaHeart size={20} />
             </button>

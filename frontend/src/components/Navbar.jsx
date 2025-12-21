@@ -13,11 +13,6 @@ const Navbar = () => {
         <Link to="/" className="text-2xl font-serif text-primary font-bold">
           LuxeCase
         </Link>
-        <input
-          type="text"
-          placeholder="Search boxes..."
-          className="hidden md:block px-4 py-2 rounded-full text-black focus:outline-none bg-gray-100"
-        />
         <div className="flex items-center space-x-6">
           <Link to="/wishlist" className="hover:text-primary transition">
             <FaHeart size={20} />

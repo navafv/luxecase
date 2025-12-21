@@ -64,20 +64,30 @@ class AdminOrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAdminUser] # Strict Admin check
 
-class AdminOrderStatusUpdateView(views.APIView):
+class AdminOrderUpdateView(views.APIView):
+    """
+    Unified view for Admins to update Status AND Payment Info.
+    """
     permission_classes = [permissions.IsAdminUser]
 
     def patch(self, request, pk):
         order = get_object_or_404(Order, pk=pk)
-        new_status = request.data.get('status')
         
-        if new_status not in dict(Order.STATUS_CHOICES):
-            return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+        # Update Status if provided
+        if 'status' in request.data:
+            order.status = request.data['status']
         
-        order.status = new_status
+        # Update Payment Info if provided
+        if 'amount_paid' in request.data:
+            order.amount_paid = request.data['amount_paid']
+        if 'payment_method' in request.data:
+            order.payment_method = request.data['payment_method']
+        if 'payment_note' in request.data:
+            order.payment_note = request.data['payment_note']
+
         order.save()
-        return Response({'status': 'success', 'new_status': order.status})
-    
+        return Response({'status': 'success', 'msg': 'Order updated'})
+
 class AdminAnalyticsView(APIView):
     permission_classes = [permissions.IsAdminUser]
 

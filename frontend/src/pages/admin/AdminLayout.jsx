@@ -14,7 +14,7 @@ const AdminLayout = () => {
         </div>
         <nav className="grow p-4 space-y-2">
           <Link
-            to="/admin/dashboard"
+            to="/admin"
             className="flex items-center p-3 hover:bg-gray-800 rounded transition"
           >
             <FaClipboardList className="mr-3" /> Dashboard

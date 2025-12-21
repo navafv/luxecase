@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api";
 import ProductCard from "../components/ProductCard";
 import { useSearchParams } from "react-router-dom";
@@ -9,7 +9,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Get URL params
   const currentCategory = searchParams.get("category__slug") || "";
   const searchTerm = searchParams.get("search") || "";
 

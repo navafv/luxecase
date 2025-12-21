@@ -60,21 +60,16 @@ const CartPage = () => {
 
               {/* Quantity Controls */}
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                >
-                  -
-                </button>
-                <span className="font-medium w-8 text-center">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                >
-                  +
-                </button>
+                <label className="text-sm text-gray-500">Qty:</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateQuantity(item.id, parseInt(e.target.value) || 1)
+                  }
+                  className="w-16 p-1 border rounded text-center"
+                />
               </div>
 
               {/* Remove Button */}

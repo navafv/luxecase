@@ -121,7 +121,7 @@ function App() {
             {/* Admin Routes (Protected) */}
             <Route path="/admin" element={<AdminRoute />}>
               <Route element={<AdminLayout />}>
-                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="" element={<AdminDashboard />} />
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products/add" element={<ProductForm />} />
