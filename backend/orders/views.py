@@ -1,4 +1,6 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, views, status
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Order
@@ -57,3 +59,17 @@ class AdminOrderListView(generics.ListAPIView):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAdminUser] # Strict Admin check
+
+class AdminOrderStatusUpdateView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, pk):
+        order = get_object_or_404(Order, pk=pk)
+        new_status = request.data.get('status')
+        
+        if new_status not in dict(Order.STATUS_CHOICES):
+            return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = new_status
+        order.save()
+        return Response({'status': 'success', 'new_status': order.status})
