@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
@@ -18,7 +18,6 @@ const CheckoutPage = () => {
   });
 
   useEffect(() => {
-    // Fetch saved addresses
     api
       .get("users/addresses/")
       .then((res) => setSavedAddresses(res.data))
@@ -45,7 +44,6 @@ const CheckoutPage = () => {
 
     const orderPayload = {
       ...formData,
-      total_amount: 0, // Backend calculates this now
       status: "Pending",
       items: cartItems.map((item) => ({
         product_id: item.id,
@@ -59,7 +57,10 @@ const CheckoutPage = () => {
       clearCart();
       navigate("/order-success");
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Order failed");
+      console.error("Order failed:", error.response?.data);
+      toast.error(
+        error.response?.data?.detail || "Order failed. Check stock or details."
+      );
     } finally {
       setLoading(false);
     }
@@ -78,7 +79,6 @@ const CheckoutPage = () => {
         <div className="md:w-1/2 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Shipping Details</h2>
 
-          {/* Saved Addresses Buttons */}
           {savedAddresses.length > 0 && (
             <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
               {savedAddresses.map((addr) => (
@@ -142,7 +142,7 @@ const CheckoutPage = () => {
               disabled={loading}
               className="w-full bg-dark text-white py-3 rounded mt-4 hover:bg-primary transition disabled:bg-gray-400"
             >
-              {loading ? "Processing..." : `Place Order`}
+              {loading ? "Processing..." : "Place Order"}
             </button>
           </form>
         </div>

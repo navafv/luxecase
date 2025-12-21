@@ -28,6 +28,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims to the token payload
         token['user_name'] = f"{user.first_name} {user.last_name}"
         token['email'] = user.email
+        token['user_id'] = user.id
         token['is_admin'] = user.is_staff
 
         return token

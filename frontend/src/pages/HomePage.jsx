@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../api";
 import ProductCard from "../components/ProductCard";
 import { useSearchParams } from "react-router-dom";
@@ -18,10 +18,9 @@ const HomePage = () => {
     api.get("products/categories/").then((res) => setCategories(res.data));
   }, []);
 
-  // Fetch Products (Depends on URL params)
+  // Fetch Products with Filters
   useEffect(() => {
     setLoading(true);
-    // Build query string: ?category__slug=box&search=velvet
     const params = new URLSearchParams();
     if (currentCategory) params.append("category__slug", currentCategory);
     if (searchTerm) params.append("search", searchTerm);
@@ -29,6 +28,7 @@ const HomePage = () => {
     api
       .get(`products/?${params.toString()}`)
       .then((res) => setProducts(res.data))
+      .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [currentCategory, searchTerm]);
 
@@ -41,18 +41,10 @@ const HomePage = () => {
     });
   };
 
-  const handleCategoryClick = (slug) => {
-    setSearchParams({
-      category__slug: slug,
-      ...(searchTerm ? { search: searchTerm } : {}),
-    });
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Search & Filter Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        {/* Category Pills */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           <button
             onClick={() => setSearchParams({})}
@@ -67,7 +59,7 @@ const HomePage = () => {
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => handleCategoryClick(cat.slug)}
+              onClick={() => setSearchParams({ category__slug: cat.slug })}
               className={`px-4 py-2 rounded-full whitespace-nowrap ${
                 currentCategory === cat.slug
                   ? "bg-primary text-white"
@@ -79,7 +71,6 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Search Form */}
         <form onSubmit={handleSearch} className="flex w-full md:w-auto">
           <input
             name="search"

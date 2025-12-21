@@ -17,6 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'full_name', 'address', 'city', 'phone', 
             'total_amount', 'status', 'is_paid', 'created_at', 'items'
         ]
+        # Security: Prevent frontend from editing these
         read_only_fields = ['total_amount', 'user', 'status', 'is_paid']
 
     def create(self, validated_data):
@@ -48,7 +49,7 @@ class OrderSerializer(serializers.ModelSerializer):
             for item in items_data:
                 product = Product.objects.select_for_update().get(id=item['product_id'])
                 
-                # Double check stock inside transaction to prevent race conditions
+                # Double check stock inside transaction
                 if product.stock < item['quantity']:
                     raise serializers.ValidationError(f"Stock changed! {product.name} is out of stock.")
 
