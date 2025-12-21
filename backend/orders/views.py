@@ -39,3 +39,21 @@ class OrderCreateView(generics.CreateAPIView):
             )
         except Exception as e:
             print(f"Email failed: {e}")
+
+class MyOrderListView(generics.ListAPIView):
+    """
+    Returns only the orders belonging to the logged-in user.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+    
+class AdminOrderListView(generics.ListAPIView):
+    """
+    Returns ALL orders (for Admins only).
+    """
+    queryset = Order.objects.all().order_by('-created_at')
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAdminUser] # Strict Admin check
