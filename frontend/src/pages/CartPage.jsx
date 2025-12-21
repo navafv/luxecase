@@ -1,10 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { FaTrash } from "react-icons/fa";
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!user) {
+      alert("Please login to complete your order.");
+      navigate("/login");
+      return;
+    }
+    // Proceed to Checkout Logic (This creates the Order in Django)
+    // We can do this in the next step or here quickly:
+    placeOrder();
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -93,7 +107,10 @@ const CartPage = () => {
             </div>
 
             {/* Checkout Button (Logic comes in Part 5) */}
-            <button className="w-full bg-dark text-white py-3 rounded-lg font-semibold hover:bg-primary transition duration-300">
+            <button
+              onClick={handleCheckout}
+              className="w-full bg-dark text-white py-3 rounded-lg font-semibold hover:bg-primary transition duration-300"
+            >
               Proceed to Checkout
             </button>
           </div>

@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 const Navbar = () => {
   const { cartCount } = useCart();
+  const { user, logout } = useAuth();
 
   return (
     <nav className="bg-dark text-white shadow-md p-4">
@@ -26,9 +28,18 @@ const Navbar = () => {
               </span>
             )}
           </Link>
-          <Link to="/login" className="hover:text-primary transition">
-            <FaUser size={20} />
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-sm">Hi, {user.name}</span>
+              <button onClick={logout} className="text-sm hover:text-red-400">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="hover:text-primary transition">
+              <FaUser size={20} />
+            </Link>
+          )}
         </div>
       </div>
     </nav>
