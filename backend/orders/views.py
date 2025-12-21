@@ -1,10 +1,14 @@
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
 from rest_framework import generics, permissions, views, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Order
 from .serializers import OrderSerializer
+from users.models import User
 
 class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
@@ -73,3 +77,40 @@ class AdminOrderStatusUpdateView(views.APIView):
         order.status = new_status
         order.save()
         return Response({'status': 'success', 'new_status': order.status})
+    
+class AdminAnalyticsView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        # 1. Total Stats
+        total_revenue = Order.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        total_orders = Order.objects.count()
+        total_users = User.objects.count()
+
+        # 2. Monthly Sales (for the Chart)
+        monthly_sales = (
+            Order.objects
+            .annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(revenue=Sum('total_amount'), count=Count('id'))
+            .order_by('month')
+        )
+
+        # 3. Recent Orders (Top 5)
+        recent_orders = Order.objects.all().order_by('-created_at')[:5].values(
+            'id', 'full_name', 'total_amount', 'status'
+        )
+
+        return Response({
+            'total_revenue': total_revenue,
+            'total_orders': total_orders,
+            'total_users': total_users,
+            'sales_data': [
+                {
+                    'name': sales['month'].strftime('%b'), # e.g., "Jan"
+                    'revenue': sales['revenue'],
+                    'orders': sales['count']
+                } for sales in monthly_sales
+            ],
+            'recent_orders': recent_orders
+        })
